@@ -15,9 +15,9 @@ public class Subscription {
     private String id;
     private String planType;
     private double price;
-    @ManyToOne
-    private Customer customer;
-
+   // @ManyToOne
+    //private Customer customer;
+   private String customerId; // Reference to Customer ID in MongoDB
     //Getters and Setters
     public String getId() {return id;}
     public void setId(String id) {this.id=id;}
@@ -34,11 +34,11 @@ public class Subscription {
     public void setPrice(double price) {
         this.price = price;
     }
-    public Customer getCustomer() {
-        return customer;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 }

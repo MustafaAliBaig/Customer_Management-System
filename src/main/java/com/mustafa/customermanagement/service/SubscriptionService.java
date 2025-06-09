@@ -29,6 +29,7 @@ public class SubscriptionService {
         return subscriptionRepository.findById(id).map(existing -> {
             existing.setPlanType(subscription.getPlanType());
             existing.setPrice(subscription.getPrice());
+            existing.setCustomerId(subscription.getCustomerId());
             return subscriptionRepository.save(existing);
         });
     }
