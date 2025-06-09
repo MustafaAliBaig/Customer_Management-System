@@ -81,4 +81,9 @@ public class CustomerController {
         }
         return ResponseEntity.notFound().build();
     }
+    // ✅ Public Hello endpoint
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello, this is a public endpoint!";
+    }
 }
