@@ -42,7 +42,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/test-security-manager","/api/customers","/api/hello", "/auth/**", "/error","/api/subscriptions").permitAll()
+                        .requestMatchers("/test-security-manager","/api/customers","/api/auth/login","/api/hello", "/auth/**", "/error","/api/subscriptions").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
@@ -52,6 +52,7 @@ public class SecurityConfig {
     // 🔥 Add this bean to fix the error
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+        AuthenticationManager authenticationManager = config.getAuthenticationManager();
+        return authenticationManager;
     }
 }
