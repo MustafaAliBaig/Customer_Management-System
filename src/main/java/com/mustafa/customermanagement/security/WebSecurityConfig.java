@@ -1,3 +1,4 @@
+/*
 package com.mustafa.customermanagement.security;
 
 import org.springframework.context.annotation.Configuration;
@@ -15,3 +16,4 @@ public class WebSecurityConfig {
     }
 
 }
+*/
