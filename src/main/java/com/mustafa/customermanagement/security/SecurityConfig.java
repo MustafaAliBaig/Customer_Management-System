@@ -1,58 +1,41 @@
 package com.mustafa.customermanagement.security;
-//
-//    import org.springframework.context.annotation.Bean;
-//    import org.springframework.context.annotation.Configuration;
-//    import org.springframework.security.config.Customizer;
-//    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//    import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-//    import org.springframework.security.web.SecurityFilterChain;
-//
-//    @Configuration
-//    @EnableWebSecurity
-//    public class SecurityConfig {
-//        @Bean
-//        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//            http.csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST API
-//                    .authorizeHttpRequests(auth -> auth
-//                            .anyRequest().authenticated()
-//                    )
-//                    //.httpBasic();
-//                    .httpBasic(Customizer.withDefaults()); // Modern Basic Auth configuration
-//            return http.build();
-//        }
-//    }
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/test-security-manager","/api/customers","/api/auth/login","/api/hello", "/auth/**", "/error","/api/subscriptions").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/hello", "/api/customers", "/api/subscriptions").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public UserDetailsService userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
@@ -68,10 +51,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔥 Add this bean to fix the error
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        AuthenticationManager authenticationManager = config.getAuthenticationManager();
-        return authenticationManager;
+        return config.getAuthenticationManager();
     }
 }

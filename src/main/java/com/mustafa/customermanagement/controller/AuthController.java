@@ -1,6 +1,8 @@
 package com.mustafa.customermanagement.controller;
 
 import com.mustafa.customermanagement.security.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -19,10 +23,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        String jwt = jwtUtil.generateToken(authRequest.getUsername());
-        return ResponseEntity.ok(jwt);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            String jwt = jwtUtil.generateToken(authRequest.getUsername());
+            logger.debug("Generated JWT token: {}", jwt); // Log the token
+            return ResponseEntity.ok(jwt);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Authentication failed: " + e.getMessage());
+        }
     }
 }
 
